@@ -1,22 +1,19 @@
 // func.js
-function deleteRecord(UID) {
+function deleteRecord(JID) {
   if (confirm('คุณต้องการจะลบข้อมูลหรือไม่?')) {
-    fetch(`/delete/${UID}`, {
+    fetch(`/delete/${JID}`, {
       method: 'DELETE',
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          // Remove the deleted row from the HTML table
-          const row = document.getElementById(`row-${UID}`);
-          row.parentNode.removeChild(row);
-          showDeletedalert();
-          hideDeletealert();
+          // Trigger a page reload after a successful delete
+          window.location.reload();
         }
       })
       .catch((error) => {
         console.error('Error:', error);
-        showerroralert();
+        showErrorAlert();
       });
   }
 }
@@ -48,3 +45,4 @@ function hideEditAlert() {
   const editedAlert = document.getElementById('edited-alert');
   editedAlert.style.display = 'none';
 }
+

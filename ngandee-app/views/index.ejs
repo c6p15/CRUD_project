@@ -3,80 +3,63 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ngandee Project</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="styles.css"> <!-- Include your custom CSS if needed -->
-  <script src="/func.js">
-    document.addEventListener('DOMContentLoaded', function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const edited = urlParams.get('edited');
-
-      if (edited === 'true') {
-        showEditAlert();
-      }
-    });
-    
-    function showEditAlert() {
-      const editedAlert = document.getElementById('edited-alert');
-      editedAlert.style.display = 'block';
-
-      setTimeout(function () {
-        hideEditAlert();
-      }, 2500);
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <script src="/func.js"></script>
+  <style>
+    div{
+      color: white;
     }
-
-    function hideEditAlert() {
-      const editedAlert = document.getElementById('edited-alert');
-      editedAlert.style.display = 'none';
-    }
-  </script>
+  </style>
 </head>
-<body style="background-color: gray;">
-  <h1 class="text-center mt-5 mb-5" style="font-size: 100px;">ข้อมูล User</h1>
-  <div style="margin: 0px 15% 0px 15%;">
-    <div id="success-alert" class="alert alert-success" style="display: none;">
-      ลบข้อมูลสำเร็จเรียบร้อย
+<body style="background-color: #343060;">
+  <div class="pt-5 pb-2"style="margin: 0px 15% 0px 15%; background-color: #201A31; display: flex; justify-content: space-between;">
+    <div class="text-start" style="font-size: 85px; color: white; margin-left: 10%; height: auto;">
+      <h1 style="font-size: 85px; margin-bottom: 10px;">งานของฉัน</h1>
     </div>
-    <div id="edited-alert" class="alert alert-success" style="display: none;">
-      แก้ไขข้อมูลสำเร็จเสร็จสรรพ
+    <div class="mt-5 mb-5"style="float: right; margin-right: 10%; display: flex; justify-content: space-between;">
+        <a href="/add" class="btn btn-primary btn-lg mx-2">เพิ่มข้อมูล</a>
     </div>
-    <table class="table table-dark">
-      <thead>
-        <tr>
-          <th scope="col">UID</th>
-          <th scope="col">SSN</th>
-          <th scope="col">UName</th>
-          <th scope="col">UGender</th>
-          <th scope="col">UBirthDate</th>
-          <th scope="col">UDetail</th>
-          <th scope="col">UAddr</th>
-          <th scope="col">UEmail</th>
-          <th scope="col">UPhoneNo</th>
-          <th scope="col">แก้ไข</th>
-          <th scope="col">ลบ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% data.forEach(record => { %>
-          <tr id="row-<%= record.UID %>">
-            <th scope="row"><%= record.UID %></th>
-            <td><%= record.SSN %></td>
-            <td><%= record.UName %></td>
-            <td><%= record.UGender %></td>
-            <td><%= new Date(record.UBirthDate).toLocaleDateString('en-GB') %></td>
-            <td><%= record.UDetail %></td>
-            <td><%= record.UAddr %></td>
-            <td><%= record.UEmail %></td>
-            <td><%= record.UPhoneNo %></td>
-            <td><a href="/edit/<%= record.UID %>" class="btn btn-warning" >แก้ไข</a></td>
-            <td><button class="btn btn-danger"onclick="deleteRecord(<%= record.UID %>)">ลบ</button></td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-    <div class="text-center">
-      <a href="/add" class="btn btn-primary btn-lg mx-2">เพิ่มข้อมูล</a>
-    </div>
+  </div>
+  <!-- บ๊อกส์รายการร้าน -->
+  <div id="boxoutside" style="margin: 0px 15% 0px 15%; background-color: rgba(217, 217, 217, 0.15); text-align: center; display: flex; justify-content: center; align-items: center;">
+    <ul style="list-style: none;">
+      <% data.forEach(record => { %>
+          <li class="mt-2 mb-2" data-jid="<%= record.JID %>" id="row-<%= record.JID %>">
+            <div class="boxinside" style="display: flex; opacity: 1;">
+                <div>
+                    <img src="/" style="border: black solid 2px; width: 200px; height: 200px;">
+                  </div>
+                  <div style="margin-left: 5%; margin-top: 4px; display: flex; width: 80%;">
+                    <div style="text-align: start; font-size: large; width: max-content;"><b><%= record.JShopname %></b>
+                      <small style="font-size: 14px;">(<%= record.Jobtype %>)</small>
+                      <div id="tag" style="background-color: #FB9E32; margin-left: 5px; padding: 5px; float: right; border-radius: 7px;">
+                          ร้านค้า
+                      </div>
+                    <div>
+                  </div>
+                  <div style="display: flex; text-align: start; font-size: medium; margin-top: 2%;">
+                  <div><%= record.JShopAddr %></div>
+                  <div style="margin-left: 2%;"><%= record.Salary %></div>
+                </div>
+                <div style="display: flex;">
+                  <div style="text-align: start; margin: 5% 4px;">
+                    <a href="/moreinfo/<%= record.JID %>" class="btn btn-primary btn-lg mx-2" style="width:fit-content;">รายละเอียดเพิ่มเติม</a>
+                  </div>
+                  <div style="text-align: start; margin: 5% 4px;">
+                    <a href="/edit/<%= record.JID %>" class="btn btn-warning mx-2" style="color: white; width:fit-content;">แก้ไข</a>
+                  </div>
+                  <div style="text-align: start; margin: 5% 4px;">
+                    <button id="deleteButton<%= record.JID %>" class="btn btn-danger"onclick="deleteRecord(<%= record.JID %>)">ลบ</button>
+                  </div>
+                </div>
+              </div>
+          </li>
+      <% }); %>
+    </ul>
   </div>
 </body>
 </html>

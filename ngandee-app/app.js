@@ -4,30 +4,26 @@ const mysql = require('mysql2');
 const ejs = require('ejs');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-
+const multer = require('multer');
 
 const app = express();
-const func = require('./nodealert.js')
 app.use(express.static('public'));
 // Configure middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
-// Create a MySQL database connection pool
 const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'ngandee',
+  database: 'ngandee_test',
   connectionLimit: 10,
 });
 
-// Set the view engine to EJS
 app.set('view engine', 'ejs');
 
-// Route to display the list of users
 app.get('/', (req, res) => {
-  const sqlQuery = 'SELECT * FROM user';
+  const sqlQuery = 'SELECT * FROM job';
   pool.query(sqlQuery, (err, results) => {
     if (err) {
       console.error('Database query error:', err);
@@ -38,16 +34,27 @@ app.get('/', (req, res) => {
   });
 });
 
-// Route to display the user addition form
 app.get('/add', (req, res) => {
   res.render('add');
 });
 
-// Route to add a new user
+app.get('/moreinfo/:JID', (req,res) => {
+  const { JID } = req.params;
+  const sqlQuery = 'SELECT * FROM job WHERE JID = ?';
+  pool.query(sqlQuery, [JID],(err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      res.status(500).send('An error occurred.' + err.message);
+      return;
+    }
+    res.render('moreinfo', { JID, data: results[0]});
+  });
+})
+
 app.post('/add', (req, res) => {
-  const { SSN, UName, UGender, UBirthDate, UDetail, UAddr, UEmail, UPhoneNo } = req.body;
-  const sqlQuery = 'INSERT INTO user (SSN, UName, UGender, UBirthDate, UDetail, UAddr, UEmail, UPhoneNo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-  pool.execute(sqlQuery, [SSN, UName, UGender, UBirthDate, UDetail, UAddr, UEmail, UPhoneNo], (err, results) => {
+  const { JShopname,JName, Salary, Jobtype, JshopAddr, Jtime, Qulification, JDetail } = req.body;
+  const sqlQuery = 'INSERT INTO job (JShopname, JName, Salary, Jobtype, JshopAddr, Jtime, Qulification, JDetail) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+  pool.execute(sqlQuery, [JShopname, JName, Salary, Jobtype, JshopAddr, Jtime, Qulification, JDetail], (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       res.status(500).send('An error occurred.');
@@ -57,30 +64,24 @@ app.post('/add', (req, res) => {
   });
 });
 
-// Route to display the user edit form
-app.get('/edit/:UID', (req, res) => {
-  const { UID } = req.params;
-  const sqlQuery = 'SELECT * FROM user WHERE UID = ?';
-  pool.query(sqlQuery, [UID], (err, results) => {
+app.get('/edit/:JID', (req, res) => {
+  const { JID } = req.params; 
+  const sqlQuery = 'SELECT * FROM job WHERE JID = ?';
+  pool.query(sqlQuery, [JID], (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       res.status(500).send('An error occurred.' + err.message);
       return;
     }
-    const data = results[0];
-    const birthDate = new Date(data.UBirthDate);
-    const formattedUBirthDate = `${birthDate.getFullYear()}-${(birthDate.getMonth() + 1).toString().padStart(2, '0')}-${birthDate.getDate().toString().padStart(2, '0')}`;
-    data.UBirthDate = formattedUBirthDate;
-    res.render('edit', { data: data });
+    res.render('edit', { JID, data: results[0]});
   });
 });
 
-// Route to update user information
-app.post('/edit/:UID', (req, res) => {
-  const { UID } = req.params;
-  const { SSN, UName, UGender, UBirthDate, UDetail, UAddr, UEmail, UPhoneNo } = req.body;
-  const sqlQuery = 'UPDATE user SET SSN = ?, UName = ?, UGender = ?, UBirthDate = ?, UDetail = ?, UAddr = ?, UEmail = ?, UPhoneNo = ? WHERE UID = ?';
-  pool.execute(sqlQuery, [SSN, UName, UGender, UBirthDate, UDetail, UAddr, UEmail, UPhoneNo, UID], (err, results) => {
+app.post('/edit/:JID', (req, res) => {
+  const { JID } = req.params;
+  const { JShopname,JName, Salary, Jobtype, JshopAddr, Jtime, Qulification, JDetail } = req.body;
+  const sqlQuery = 'UPDATE job SET JShopname = ?, JName = ?, Salary = ?, Jobtype = ?, Jtime = ?, Qulification = ?, JDetail = ? WHERE JID = ?';
+  pool.execute(sqlQuery, [JShopname, JName, Salary, Jobtype, JshopAddr, Jtime, Qulification, JDetail], (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       res.status(500).send('An error occurred: ' + err.message);
@@ -90,11 +91,10 @@ app.post('/edit/:UID', (req, res) => {
   });
 });
 
-// Route to delete a user
-app.delete('/delete/:UID', (req, res) => {
-  const { UID } = req.params;
-  const sqlQuery = 'DELETE FROM user WHERE UID = ?';
-  pool.execute(sqlQuery, [UID], (err, results) => {
+app.delete('/delete/:JID', (req, res) => {
+  const { JID } = req.params;
+  const sqlQuery = 'DELETE FROM job WHERE JID = ?';
+  pool.execute(sqlQuery, [JID], (err, results) => {
     if (err) {
       console.error('Database query error:', err);
       res.status(500).json({ success: false, message: 'An error occurred: ' + err.message });
