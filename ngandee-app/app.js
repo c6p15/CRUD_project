@@ -4,7 +4,6 @@ const mysql = require('mysql2');
 const ejs = require('ejs');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const multer = require('multer');
 
 const app = express();
 app.use(express.static('public'));
